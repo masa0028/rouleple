@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>音声ロープレ｜オイル交換LP Zoom商談デモ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    body {
+      margin: 0;
+      background: #020617;
+      color: #e5e7eb;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      padding: 12px;
+    }
+    .app {
+      background: #020617;
+      border-radius: 16px;
+      max-width: 1000px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+      overflow: hidden;
+      border: 1px solid rgba(148,163,184,0.4);
+    }
+    .header {
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(148,163,184,0.3);
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      background: radial-gradient(circle at top left,#1f2937,#020617);
+    }
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .subtitle {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+    .header-right {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .tag {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(34,197,94,0.6);
+      color: #bbf7d0;
+      background: rgba(22,163,74,0.2);
+    }
+    .pill {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.6);
+      color: #e5e7eb;
+      background: rgba(15,23,42,0.7);
+    }
+
+    .char-panel {
+      padding: 8px 12px;
+      border-bottom: 1px solid rgba(30,64,175,0.5);
+      background: #020617;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .char-label {
+      font-size: 12px;
+      color: #9ca3af;
+      margin-right: 4px;
+      white-space: nowrap;
+    }
+    .char-btn {
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.6);
+      padding: 4px 10px;
+      font-size: 11px;
+      background: #020617;
+      color: #e5e7eb;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: background 0.15s ease, transform 0.1s ease, border-color 0.15s ease;
+      white-space: nowrap;
+    }
+    .char-btn span {
+      font-size: 13px;
+    }
+    .char-btn.active {
+      background: #1d4ed8;
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 1px rgba(59,130,246,0.5);
+    }
+    .char-desc {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-left: 4px;
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .main {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+    }
+    .video-area {
+      flex: 4;
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+      border-right: 1px solid rgba(30,64,175,0.5);
+      background: radial-gradient(circle at top,#111827,#020617 60%);
+    }
+    .fake-video {
+      flex: 1;
+      border-radius: 12px;
+      border: 1px solid rgba(148,163,184,0.5);
+      padding: 10px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      background: radial-gradient(circle at top left,#1f2937,#020617);
+    }
+    .participant {
+      border-radius: 10px;
+      border: 1px solid rgba(148,163,184,0.6);
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg,#020617,#111827);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .participant-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 999px;
+      border: 2px solid rgba(96,165,250,0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      margin-bottom: 6px;
+    }
+    .participant-label {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+    .participant-name {
+      position: absolute;
+      left: 8px;
+      bottom: 6px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.9);
+      font-size: 11px;
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+    .controls-bar {
+      margin-top: 8px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      align-items: center;
+    }
+    .round-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      border: none;
+      background: #111827;
+      color: #e5e7eb;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.1s ease, background 0.1s ease, box-shadow 0.1s ease;
+    }
+    .round-btn.mic-on {
+      background: #059669;
+      box-shadow: 0 0 0 2px rgba(16,185,129,0.5);
+    }
+    .round-btn:hover {
+      transform: translateY(-1px);
+      background: #1f2933;
+    }
+    .round-btn.disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .mic-hint {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+
+    .chat-area {
+      flex: 5;
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+      gap: 8px;
+    }
+    .chat-log {
+      flex: 1;
+      border-radius: 10px;
+      border: 1px solid rgba(148,163,184,0.5);
+      background: #020617;
+      padding: 10px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      scroll-behavior: smooth;
+    }
+    .system-msg {
+      font-size: 11px;
+      color: #94a3b8;
+      text-align: center;
+    }
+    .bubble-row {
+      display: flex;
+      gap: 6px;
+      align-items: flex-end;
+    }
+    .bubble-row.ai {
+      justify-content: flex-start;
+    }
+    .bubble-row.user {
+      justify-content: flex-end;
+    }
+    .avatar-small {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      flex-shrink: 0;
+      background: #020617;
+    }
+    .bubble {
+      max-width: 75%;
+      padding: 7px 9px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+    .bubble.ai {
+      background: #0f172a;
+      border-bottom-left-radius: 3px;
+    }
+    .bubble.user {
+      background: #2563eb;
+      border-bottom-right-radius: 3px;
+    }
+    .bubble-meta {
+      font-size: 10px;
+      color: #9ca3af;
+      margin-top: 2px;
+    }
+
+    .footer {
+      padding: 6px 10px 8px;
+      border-top: 1px solid rgba(148,163,184,0.3);
+      font-size: 11px;
+      color: #94a3b8;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .score-pill {
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(34,197,94,0.7);
+      color: #bbf7d0;
+      background: rgba(22,163,74,0.18);
+      font-size: 11px;
+    }
+
+    @media (max-width: 900px) {
+      .main {
+        flex-direction: column;
+      }
+      .video-area {
+        border-right: none;
+        border-bottom: 1px solid rgba(30,64,175,0.5);
+      }
+    }
+    @media (max-width: 600px) {
+      body {
+        padding: 6px;
+      }
+      .title {
+        font-size: 14px;
+      }
+      .char-panel {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="header-left">
+      <div class="title">音声ロープレ｜オイル交換LP提案 Zoom商談デモ</div>
+      <div class="subtitle">Webサイト会社 → 整備工場向け／オイル交換LP新規集客提案ロールプレイ</div>
+    </div>
+    <div class="header-right">
+      <div class="tag">音声メイン・テキストログ付き</div>
+      <div class="pill">シナリオ：初回オンライン商談（ヒアリング〜提案）</div>
+    </div>
+  </div>
+
+  <!-- キャラクター設定 -->
+  <div class="char-panel">
+    <div class="char-label">👤 ロープレ相手（整備工場側キャラクター）：</div>
+
+    <button class="char-btn active" data-char-id="smallRural">
+      <span>🏡</span>小規模 × 地方 × 社長
+    </button>
+    <button class="char-btn" data-char-id="mediumSuburban">
+      <span>🚗</span>中規模 × 郊外 × 工場長
+    </button>
+    <button class="char-btn" data-char-id="largeUrban">
+      <span>🏙</span>大規模 × 都市部 × 統括マネージャー
+    </button>
+
+    <div class="char-desc" id="charDesc">
+      現在：小規模 × 地方 × 社長｜職人肌でちょっとぶっきらぼう。コストに厳しめ。
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- 左：Zoom風画面＋マイクボタン -->
+    <div class="video-area">
+      <div class="fake-video">
+        <div class="participant">
+          <div class="participant-avatar">整</div>
+          <div class="participant-label" id="charLabelMain">小規模・地方の整備工場社長（AI）</div>
+          <div class="participant-name" id="charNameChip">🧑‍🔧 佐藤社長</div>
+        </div>
+        <div class="participant">
+          <div class="participant-avatar">提</div>
+          <div class="participant-label">Webサイト会社（あなた・音声入力）</div>
+          <div class="participant-name">💼 あなた</div>
+        </div>
+      </div>
+      <div class="controls-bar">
+        <button class="round-btn" id="aiSpeakBtn" title="AI（整備工場側）に次のセリフを話させる">
+          🧑‍🔧
+        </button>
+        <button class="round-btn" id="micBtn" title="マイクであなたの発言を録音">
+          🎤
+        </button>
+        <div class="mic-hint" id="micHint">
+          「🧑‍🔧」でAIが話し、「🎤」を押してから声で返答してください。
+        </div>
+      </div>
+    </div>
+
+    <!-- 右：ログ表示 -->
+    <div class="chat-area">
+      <div class="chat-log" id="chatLog">
+        <div class="system-msg">
+          デモ手順：① 上のボタンでロープレ相手のキャラを選ぶ → ②「🧑‍🔧 AI」ボタンで店長役の発言 → ③「🎤 マイク」であなたが声で返答 → 繰り返し。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div>
+      ヒント：<br/>
+      ・最初に「本日はお時間をいただきありがとうございます」と挨拶<br/>
+      ・課題ヒアリング → オイル交換LPの価値 → 事例 → プラン提案 の流れを意識
+    </div>
+    <div id="scoreArea" class="score-pill" style="display:none;"></div>
+  </div>
+</div>
+
+<script>
+  // ===== キャラクター定義 =====
+  const characters = {
+    smallRural: {
+      id: "smallRural",
+      labelMain: "小規模・地方の整備工場社長（AI）",
+      nameChip: "🧑‍🔧 佐藤社長",
+      desc: "現在：小規模 × 地方 × 社長｜職人肌でちょっとぶっきらぼう。コストに厳しめ。",
+      tone: "casual"
+    },
+    mediumSuburban: {
+      id: "mediumSuburban",
+      labelMain: "中規模・郊外の整備工場 工場長（AI）",
+      nameChip: "🧑‍🔧 鈴木工場長",
+      desc: "現在：中規模 × 郊外 × 工場長｜現場と経営のバランス型。話はきちんと聞くタイプ。",
+      tone: "neutral"
+    },
+    largeUrban: {
+      id: "largeUrban",
+      labelMain: "大規模・都市部の整備チェーン 統括マネージャー（AI）",
+      nameChip: "🧑‍💼 田中マネージャー",
+      desc: "現在：大規模 × 都市部 × 統括マネージャー｜数字・効率重視。ロジックに敏感。",
+      tone: "formal"
+    }
+  };
+
+  let currentCharacter = characters.smallRural;
+
+  const charBtns = document.querySelectorAll(".char-btn");
+  const charDesc = document.getElementById("charDesc");
+  const charLabelMain = document.getElementById("charLabelMain");
+  const charNameChip = document.getElementById("charNameChip");
+
+  charBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-char-id");
+      currentCharacter = characters[id];
+      charBtns.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      charDesc.textContent = currentCharacter.desc;
+      charLabelMain.textContent = currentCharacter.labelMain;
+      charNameChip.textContent = currentCharacter.nameChip;
+
+      appendSystemMsg(`ロープレ相手が「${currentCharacter.labelMain}」に切り替わりました。`);
+    });
+  });
+
+  // ===== シナリオ（トーン別） =====
+  const scenarioSteps = [
+    {
+      tag: "導入",
+      texts: {
+        casual: "今日はどうも。最近、広告とかホームページの会社さんからよく電話が来るんですけどね、正直どれも本当に効果あるのか分からなくて…。今日はどんな話なんです？",
+        neutral: "本日はよろしくお願いします。最近、広告会社さんやIT関連の会社さんからのご提案が増えていまして、どれが本当に効果があるのか見極めたいと思っているところです。今回はどのような内容でしょうか？",
+        formal: "本日はお時間いただきありがとうございます。ここ数年、様々なWeb・マーケティング会社さまからご提案をいただいているのですが、投資対効果が読みにくく、慎重に検討している状況です。本日はどのようなご提案でしょうか。"
+      }
+    },
+    {
+      tag: "LPイメージ",
+      texts: {
+        casual: "オイル交換のLPって言われても、正直ピンと来てないんですよね。なんかカッコいいページ作ってもらっても、ちゃんとお客さん来るのかっていうのが一番気になってて。",
+        neutral: "オイル交換向けのLPと伺いましたが、正直、LPと言われてもあまりイメージができていません。見栄えが良くても、本当に新規の方が増えるのかが気になっています。",
+        formal: "オイル交換LPとのことですが、いわゆるランディングページの具体的な役割や、既存のサイトとの違いについて、まだ明確なイメージを持てておりません。新規集客にどの程度寄与するのかを知りたいと考えています。"
+      }
+    },
+    {
+      tag: "課題・本音",
+      texts: {
+        casual: "うちも新しいお客さんは増やしたいんですけどね、今までチラシとかやっても思ったほど反応がなくて…。あんまり広告費ばっかりかけるのは正直怖いんですよ。",
+        neutral: "新規のお客様は増やしていきたいと思っているのですが、これまでチラシなどを試しても想定ほどの反応が得られませんでした。あまり大きな広告費をかけるのは不安があるのが本音です。",
+        formal: "新規顧客の獲得は強化したいテーマではあるのですが、これまで紙媒体などの施策で十分な反応が得られなかった経験もあり、費用対効果が読めない施策に大きく投資することには慎重になっております。"
+      }
+    },
+    {
+      tag: "値段不安",
+      texts: {
+        casual: "オイル交換で新規さんが来るのは分かるんですけど、結局みんな値段で見てるイメージがあって…。安さだけで来て、1回きりで終わっちゃうんじゃないかなって心配なんですよね。",
+        neutral: "オイル交換をきっかけに新規の方が来られること自体はイメージできます。ただ、どうしても“価格だけ”で選ばれてしまって、一度きりで終わってしまうのではないか、という不安があります。",
+        formal: "オイル交換を入口とした新規顧客獲得の考え方は理解できますが、実際には価格訴求のみになってしまい、単発利用で終わってしまうのではないかという懸念を持っています。"
+      }
+    },
+    {
+      tag: "事例確認",
+      texts: {
+        casual: "もし似たような工場さんでうまくいってるところがあるなら、その例はちょっと気になりますね。ざっくりでいいんで、どれくらい反応があったのか教えてもらえます？",
+        neutral: "もし、うちと規模感や地域感が近い整備工場さんでの事例があれば、ぜひ知りたいです。おおよそで構いませんので、どの程度の反応があったのか教えていただけますか？",
+        formal: "当社と規模感や商圏が近い整備事業者さまでの実績があれば、ぜひ伺いたいです。新規件数や継続率など、概算値でも結構ですので、どの程度の成果が出ているのか教えていただけますでしょうか。"
+      }
+    },
+    {
+      tag: "費用・運用",
+      texts: {
+        casual: "話を聞く限り、悪くはなさそうですね。ただ、お願いするとしたら、どれくらいお金がかかるのかと、こっち側の手間がどのくらい出るのかは、ちゃんと知っておきたいです。",
+        neutral: "お話を伺う限り、前向きに検討しても良さそうだと感じています。ただ、実際にお願いする場合の費用感と、こちら側の運用負担がどの程度発生するのかは、しっかり把握しておきたいです。",
+        formal: "お話の方向性としては検討に値する印象を持ちました。一方で、導入時・運用時それぞれの費用と、当社側に必要となる運用工数について、事前に具体的に把握しておきたいと考えています。"
+      }
+    },
+    {
+      tag: "まとめ依頼",
+      texts: {
+        casual: "分かりました。前向きには考えたいので、今日の話を一度社内でも共有したいです。ざっくりでいいので、さっきのポイントをまとめた資料やメールってお願いできます？",
+        neutral: "ありがとうございます。前向きに検討したいと思いますので、今日お話しいただいた内容を、社内で共有できるよう簡単にまとめていただくことは可能でしょうか。",
+        formal: "本日の内容については前向きに社内で検討したいと考えております。差し支えなければ、本日ご説明いただいたポイントを整理した資料、もしくは要点をまとめたメールをいただくことは可能でしょうか。"
+      }
+    }
+  ];
+
+  // ===== DOM取得 =====
+  const chatLog = document.getElementById("chatLog");
+  const aiSpeakBtn = document.getElementById("aiSpeakBtn");
+  const micBtn = document.getElementById("micBtn");
+  const micHint = document.getElementById("micHint");
+  const scoreArea = document.getElementById("scoreArea");
+
+  // ===== 会話状態 =====
+  let currentStepIndex = -1;
+  let finished = false;
+  let userTurns = 0;
+  let keywordScore = 0;
+
+  function appendMessage(role, text, meta = "") {
+    const row = document.createElement("div");
+    row.className = "bubble-row " + (role === "ai" ? "ai" : "user");
+
+    const avatar = document.createElement("div");
+    avatar.className = "avatar-small";
+    avatar.textContent = role === "ai" ? "整" : "提";
+
+    const bubbleWrap = document.createElement("div");
+    const bubble = document.createElement("div");
+    bubble.className = "bubble " + (role === "ai" ? "ai" : "user");
+    bubble.textContent = text;
+
+    const metaEl = document.createElement("div");
+    metaEl.className = "bubble-meta";
+    metaEl.textContent = meta;
+
+    bubbleWrap.appendChild(bubble);
+    if (meta) bubbleWrap.appendChild(metaEl);
+
+    if (role === "ai") {
+      row.appendChild(avatar);
+      row.appendChild(bubbleWrap);
+    } else {
+      row.appendChild(bubbleWrap);
+      row.appendChild(avatar);
+    }
+
+    chatLog.appendChild(row);
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+
+  function appendSystemMsg(text) {
+    const div = document.createElement("div");
+    div.className = "system-msg";
+    div.textContent = text;
+    chatLog.appendChild(div);
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+
+  // ===== TTS（AIが話す） =====
+  function speakText(text) {
+    if (!("speechSynthesis" in window)) return;
+    window.speechSynthesis.cancel();
+    const uttr = new SpeechSynthesisUtterance(text);
+    uttr.lang = "ja-JP";
+    uttr.rate = 1.02;
+    uttr.pitch = 1.0;
+    window.speechSynthesis.speak(uttr);
+  }
+
+  function getCurrentTone() {
+    return currentCharacter.tone || "neutral";
+  }
+
+  function nextAiLine() {
+    if (finished) return;
+
+    if (currentStepIndex >= scenarioSteps.length - 1) {
+      // シナリオ終了後の一言
+      const closing = "本シナリオのAI側の想定質問はここまでです。最後に、今日のご提案内容を一言でまとめていただけると嬉しいです。";
+      appendMessage("ai", closing, `${currentCharacter.labelMain}`);
+      speakText(closing);
+      finished = true;
+      showScoreHint();
+      return;
+    }
+
+    currentStepIndex++;
+    const step = scenarioSteps[currentStepIndex];
+    const tone = getCurrentTone();
+    const text = step.texts[tone] || step.texts.neutral;
+    appendMessage("ai", text, `${currentCharacter.labelMain}｜フェーズ：${step.tag}`);
+    speakText(text);
+  }
+
+  // ===== 音声認識（あなたの発言） =====
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognition = null;
+  let recognizing = false;
+
+  if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
+    recognition.lang = "ja-JP";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => {
+      recognizing = true;
+      micBtn.classList.add("mic-on");
+      micHint.textContent = "認識中… 話し終わったら数秒待つと自動で止まります。";
+    };
+
+    recognition.onend = () => {
+      recognizing = false;
+      micBtn.classList.remove("mic-on");
+      micHint.textContent = "「🧑‍🔧」でAIに話させ、「🎤」であなたの返答を音声入力できます。";
+    };
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript.trim();
+      if (transcript) {
+        handleUserSpeech(transcript);
+      }
+    };
+
+    recognition.onerror = (event) => {
+      recognizing = false;
+      micBtn.classList.remove("mic-on");
+      micHint.textContent = "音声認識でエラーが発生しました。もう一度「🎤」を押してください。（対応ブラウザのみ利用可能）";
+    };
+  } else {
+    micBtn.classList.add("disabled");
+    micHint.textContent = "このブラウザは音声認識に対応していません。Chromeなどでお試しください。";
+  }
+
+  function handleUserSpeech(text) {
+    appendMessage("user", text, "あなた（Webサイト会社）｜音声入力");
+    userTurns++;
+
+    // 簡易スコアリング（キーワードベース／デモ用）
+    if (text.includes("オイル交換")) keywordScore += 1;
+    if (text.includes("LP") || text.includes("ランディング")) keywordScore += 1;
+    if (text.includes("新規") || text.includes("集客")) keywordScore += 1;
+    if (text.includes("事例") || text.includes("実績")) keywordScore += 1;
+    if (text.includes("プラン") || text.includes("テスト")) keywordScore += 1;
+    if (text.includes("まずは") || text.includes("お試し")) keywordScore += 1;
+
+    if (finished) {
+      showFinalScoreIfReady();
+    } else {
+      appendSystemMsg("👉 必要に応じて「🧑‍🔧 AI」ボタンで、次の質問・リアクションに進めてください。");
+    }
+  }
+
+  micBtn.addEventListener("click", () => {
+    if (!recognition || micBtn.classList.contains("disabled")) return;
+
+    if (!recognizing) {
+      try {
+        recognition.start();
+      } catch (e) {
+        // 連打対策
+      }
+    } else {
+      recognition.stop();
+    }
+  });
+
+  aiSpeakBtn.addEventListener("click", nextAiLine);
+
+  function showScoreHint() {
+    appendSystemMsg("シナリオはひと通り終了しました。最後に一言、今日の提案のポイントをまとめて話してみてください。その内容を元に仮スコアを表示します。");
+  }
+
+  function showFinalScoreIfReady() {
+    if (userTurns < 3) return;
+    let score = 60 + keywordScore * 8;
+    if (score > 98) score = 98;
+
+    let rank = "Bronze";
+    if (score >= 85) rank = "Gold";
+    else if (score >= 75) rank = "Silver";
+
+    scoreArea.style.display = "inline-flex";
+    scoreArea.textContent = `仮評価：${score}点 ／ ランク：${rank}（デモ用）`;
+
+    appendSystemMsg("フィードバック例：課題ヒアリング → オイル交換LPの価値説明 → 事例 → プラン提案、の流れができていたかを振り返ってみてください。本番システムでは、ここにより詳細なAIコメントを追加できます。");
+  }
+
+  // 初期メッセージ
+  appendSystemMsg("これはデモ環境です。キャラクターを選んでから「🧑‍🔧」でAIに話をさせ、「🎤」であなたが声で返答する流れでロープレを進めてください。");
+</script>
+</body>
+</html>
